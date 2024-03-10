@@ -1,19 +1,37 @@
 from django.shortcuts import render,redirect
 from .models import Project,Skill,Message
-from .forms import ProjectForm
+from .forms import ProjectForm,MessageForm
+from django.contrib import messages
 
 
 def homePage(request):
     projects=Project.objects.all()
     detailedSkills=Skill.objects.exclude(body='')
     skills=Skill.objects.filter(body='')
-    context={'projects':projects, 'detailedSkills':detailedSkills, 'skills':skills}
+    form=MessageForm()
+
+    if request.method == 'POST':
+        form=MessageForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request,"Your message was successfully sent.")
+
+
+
+    context={'projects':projects, 'detailedSkills':detailedSkills, 
+             'skills':skills, 'form':form}
     return render(request,'base/home.html',context)
 
 def projectPage(request,pk):
     project=Project.objects.get(id=pk)
     context={'project':project}
     return render(request,'base/project.html',context)
+
+def projectAll(request):
+
+    projects=Project.objects.all()
+    context={'projects':projects}
+    return render(request,'base/projectAll.html',context)
 
 
 def addProject(request):
@@ -42,8 +60,8 @@ def editProject(request, pk):
 
 def inboxPage(request):
     inbox=Message.objects.all().order_by('is_read')
-
-    context={'inbox':inbox}
+    unreadCount=Message.objects.filter(is_read=False).count()
+    context={'inbox':inbox, 'unreadCount':unreadCount}
     return render(request,'base/inbox.html',context)
 
 
@@ -53,3 +71,15 @@ def messagePage(request,pk):
     message.save()
     context={'message':message}
     return render(request,'base/message.html',context)
+
+
+def contactPage(request):
+    form=MessageForm()
+    if request.method == 'POST':
+        form=MessageForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request,"Your message was successfully sent.")
+
+    context={'form':form}
+    return render(request,'base/contact.html',context)
