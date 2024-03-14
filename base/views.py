@@ -1,13 +1,14 @@
 from django.shortcuts import render,redirect
-from .models import Project,Skill,Message
-from .forms import ProjectForm,MessageForm
+from .models import Project,Skill,Message,Endorsment,Comment
+from .forms import ProjectForm,MessageForm,SkillForm,EndorsmentForm,CommentForm
 from django.contrib import messages
 
 
 def homePage(request):
-    projects=Project.objects.all()
+    projects=Project.objects.all()[0:5]
     detailedSkills=Skill.objects.exclude(body='')
     skills=Skill.objects.filter(body='')
+    endorsment=Endorsment.objects.filter(approved=True)
     form=MessageForm()
 
     if request.method == 'POST':
@@ -19,12 +20,28 @@ def homePage(request):
 
 
     context={'projects':projects, 'detailedSkills':detailedSkills, 
-             'skills':skills, 'form':form}
+             'skills':skills, 'form':form,
+             'endorsment':endorsment}
     return render(request,'base/home.html',context)
 
 def projectPage(request,pk):
     project=Project.objects.get(id=pk)
-    context={'project':project}
+    count=project.comment_set.count()
+
+    comments=project.comment_set.all().order_by('-created')
+
+    form=CommentForm()
+    if request.method == 'POST':
+        form=CommentForm(request.POST)
+        if form.is_valid():
+            comment=form.save(commit=False)
+            comment.project=project
+            comment.save()
+            messages.success(request,"Your message was successfully sent.")
+
+
+    context={'project':project, 'count':count, 'comments':comments,
+             'form':form}
     return render(request,'base/project.html',context)
 
 def projectAll(request):
@@ -83,3 +100,45 @@ def contactPage(request):
 
     context={'form':form}
     return render(request,'base/contact.html',context)
+
+
+def addSkill(request):
+
+    form=SkillForm()
+    if request.method == 'POST':
+        form=SkillForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+
+    context={'form':form}
+
+    return render(request,'base/skill_form.html',context)
+
+
+def deleteProject(request,pk):
+    project=Project.objects.get(id=pk)
+
+    if request.method == 'POST':
+        project.delete()
+        return redirect('home')
+    return render(request,'base/delete.html',{'obj':project})
+
+def deleteSkills(request,pk):
+    skill=Skill.objects.get(id=pk)
+
+    if request.method == 'POST':
+        skill.delete()
+        return redirect('home')
+    return render(request,'base/delete.html',{'obj':skill})
+
+
+def endorsment(request):
+    form=EndorsmentForm()
+    if request.method == 'POST':
+        form=EndorsmentForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+    context={'form':form}
+    return render(request,'base/endorsment.html',context)

@@ -25,9 +25,9 @@
   <h1 class="project--header">My Projects</h1>
   <h5>Please check these projects to know more about my works</h5>
 
-  <div class="project--wrapper rounded">
+  <div class="project--wrapper rounded ">
     {% for project in projects %}
-    <div class="project--column">
+    <div class="project--column  bg-body rounded">
       <a href="{% url 'project' project.id %}">
         <img
           class="project--thumbnail rounded"
@@ -44,6 +44,7 @@
     <h3>There are no projects in the database</h3>
     {% endfor %}
   </div>
+
 
   <div class="about--wrapper">
     <h3>Here About Me</h3>
@@ -78,6 +79,22 @@
       </div>
       {% endfor %}
     </div>
+  </div>
+</section>
+
+<section class="section--skills">
+  <div class="skills--container">
+    <h3 class="text-center">Endorsments</h3><span>
+    <a href="{% url 'endorsment' %}" class="btn btn-primary my-2">Add Endorsments</a></span>
+    {% for i in endorsment %}
+    <div style="margin-bottom: 2em;" class="card">
+      <div class="card-body shadow bg-body rounded">
+        <h5>{{i.name}}</h5>
+        <p>{{i.body}}</p>
+      </div>
+     
+    </div>
+    {% endfor %}
   </div>
 </section>
 

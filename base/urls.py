@@ -8,8 +8,11 @@ urlpatterns=[
     path('all-project/',views.projectAll,name='all-project'),
     path('edit-project/<str:pk>/', views.editProject, name="edit-project"),
     path('inbox/',views.inboxPage,name='inbox'),
+    path('endorsment/',views.endorsment,name='endorsment'),
+    path('delete/<str:pk>/',views.deleteProject,name='delete'),
     path('contact/',views.contactPage,name='contact'),
     path('message/<str:pk>/',views.messagePage,name='message'),
+    path('add-skill/',views.addSkill,name='add-skill'),
 
 
 ]
